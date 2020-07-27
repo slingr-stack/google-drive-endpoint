@@ -2,6 +2,150 @@
 // Public API
 /////////////////////
 
+// Changes
+
+endpoint.changes = {};
+
+endpoint.changes.getStartPageToken = function(params) {
+    return endpoint.get({
+        path: '/changes/startPageToken',
+        params: params
+    });
+};
+
+endpoint.changes.list = function(params) {
+    return endpoint.get({
+        path: '/changes',
+        params: params
+    });
+};
+
+endpoint.changes.watch = function(params) {
+    return endpoint.post({
+        path: '/changes/watch',
+        params: params
+    });
+};
+
+// Channels
+
+endpoint.channels = {};
+
+endpoint.channels.stop = function(body) {
+    return endpoint.post({
+        path: '/channels/stop',
+        body: body
+    });
+};
+
+// Comments
+
+endpoint.comments = {};
+
+endpoint.comments.create = function(fileId, params, body) {
+    return endpoint.post({
+        path: '/files/'+fileId+'/comments',
+        params: params,
+        body: body
+    });
+};
+
+endpoint.comments.delete = function(fileId, commentId) {
+    return endpoint.delete('/files/'+fileId+'/comments/'+commentId);
+};
+
+endpoint.comments.get = function(fileId, commentId, params) {
+    return endpoint.get({
+        path: '/files/'+fileId+'/comments/'+commentId,
+        params: params
+    });
+};
+
+endpoint.comments.list = function(fileId, params) {
+    return endpoint.get({
+        path: '/files/'+fileId+'/comments',
+        params: params
+    });
+};
+
+endpoint.comments.update = function(fileId, commentId, params, body) {
+    return endpoint.patch({
+        path: '/files/'+fileId+'/comments/'+commentId,
+        params: params,
+        body: body
+    });
+};
+
+// Files
+
+endpoint.files = {};
+
+endpoint.files.copy = function(fileId, params, body) {
+    return endpoint.patch({
+        path: '/files/'+fileId+'/copy',
+        params: params,
+        body: body
+    });
+};
+
+endpoint.files.uploadFile = function(slingrFileId, name, mimeType, folderId) {
+    return endpoint._uploadFile({
+        fileId: slingrFileId,
+        name: name,
+        mimeType: mimeType,
+        folderId: folderId
+    });
+};
+
+endpoint.files.downloadFile = function(fileId) {
+    // TODO
+};
+
+// Drives
+
+endpoint.drives = {};
+
+endpoint.drives.create = function(params, body) {
+    return endpoint.post({
+        path: '/drives',
+        params: params,
+        body: body
+    });
+};
+
+endpoint.drives.delete = function(driveId) {
+    return endpoint.post('/drives/'+driveId);
+};
+
+endpoint.drives.get = function(driveId, params) {
+    return endpoint.get({
+        path: '/drives/'+driveId,
+        params: params
+    });
+};
+
+endpoint.drives.hide = function(driveId) {
+    return endpoint.post('/drives/'+driveId+'/hide');
+};
+
+endpoint.drives.list = function(params) {
+    return endpoint.get({
+        path: '/drives',
+        params: params
+    });
+};
+
+endpoint.drives.unhide = function(driveId) {
+    return endpoint.post('/drives/'+driveId+'/unhide');
+};
+
+endpoint.drives.update = function(driveId, params, body) {
+    return endpoint.post({
+        path: '/drives/'+driveId,
+        params: params,
+        body: body
+    });
+};
 
 /////////////////////
 // Public API - Generic Functions

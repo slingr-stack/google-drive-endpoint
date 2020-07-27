@@ -1,9 +1,13 @@
 package io.slingr.endpoints.googledrive.services;
 
+import com.google.api.client.http.FileContent;
 import com.google.api.client.http.HttpResponseException;
+import com.google.api.client.http.InputStreamContent;
 import com.google.api.client.json.GenericJson;
 import com.google.api.client.util.DateTime;
+import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.GenericGoogleDriveService;
+import com.google.api.services.drive.model.File;
 import io.slingr.endpoints.exceptions.EndpointException;
 import io.slingr.endpoints.googledrive.GoogleDriveEndpoint;
 import io.slingr.endpoints.googledrive.services.entities.ApiException;
@@ -11,8 +15,11 @@ import io.slingr.endpoints.utils.Json;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 
 /**
  * <p>Service class that interacts with the Google Drive API
@@ -52,6 +59,20 @@ public class GoogleDriveService {
         }
         this.service = service;
         this.endpoint = endpoint;
+    }
+
+    public String uploadFile(InputStream is, String name, String mimeType, String folderId) throws IOException {
+        File fileMetadata = new File();
+        fileMetadata.setName(name);
+        if (folderId != null) {
+            fileMetadata.setParents(Collections.singletonList(folderId));
+        }
+        InputStreamContent mediaContent = new InputStreamContent(mimeType, is);
+        File file = service.files().create(fileMetadata, mediaContent)
+                .setFields("id, parents")
+                .setSupportsTeamDrives(true)
+                .execute();
+        return file.getId();
     }
 
     public Json getRequest(String url, String functionId) {

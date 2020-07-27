@@ -12,6 +12,7 @@ import io.slingr.endpoints.services.datastores.DataStore;
 import io.slingr.endpoints.services.datastores.DataStoreResponse;
 import io.slingr.endpoints.services.exchange.Parameter;
 import io.slingr.endpoints.services.exchange.ReservedName;
+import io.slingr.endpoints.services.rest.DownloadedFile;
 import io.slingr.endpoints.utils.Json;
 import io.slingr.endpoints.utils.MapsUtils;
 import io.slingr.endpoints.ws.exchange.FunctionRequest;
@@ -19,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,6 +38,8 @@ import java.util.concurrent.locks.ReentrantLock;
 public class GoogleDriveEndpoint extends PerUserEndpoint {
 
     private static final Logger logger = LoggerFactory.getLogger(GoogleDriveEndpoint.class);
+
+    private static final String API_URL = "https://www.googleapis.com/drive/v3";
 
     // user configuration properties
     private static final String PROPERTY_ID = "_id";
@@ -499,6 +503,22 @@ public class GoogleDriveEndpoint extends PerUserEndpoint {
         return response;
     }
 
+    @EndpointFunction(name = "_uploadFile")
+    public Json uploadFile(FunctionRequest request) throws IOException {
+        final Json data = request.getJsonParams();
+        final String userId = request.getUserId();
+        final String functionId = request.getFunctionId();
+        appLogs.info("Upload file request received", data);
+
+        final GoogleDriveService service = getService(data, userId, request.getUserEmail(), functionId);
+
+        DownloadedFile file = files().download(data.string("fileId"));
+        final String fileId = service.uploadFile(file.getFile(), data.string("name"), data.string("mimeType"), data.string("folderId"));
+        Json response = Json.map().set("fileId", fileId);
+        logger.info(String.format("Function upload file: [%s]", response.toString()));
+        return response;
+    }
+
     @EndpointFunction(name = "_getRequest")
     public Json getRequest(FunctionRequest request){
         final Json data = request.getJsonParams();
@@ -508,7 +528,7 @@ public class GoogleDriveEndpoint extends PerUserEndpoint {
 
         final GoogleDriveService service = getService(data, userId, request.getUserEmail(), functionId);
 
-        final Json response = service.getRequest(data.string("path"), functionId);
+        final Json response = service.getRequest(buildUrl(data.string("path")), functionId);
         logger.info(String.format("Function GET: [%s]", response.toString()));
         return response;
     }
@@ -524,7 +544,7 @@ public class GoogleDriveEndpoint extends PerUserEndpoint {
 
         final GoogleDriveService service = getService(data, userId, request.getUserEmail(), functionId);
 
-        final Json response = service.postRequest(data.string("path"), content, functionId);
+        final Json response = service.postRequest(buildUrl(data.string("path")), content, functionId);
         logger.info(String.format("Function POST: [%s]", response.toString()));
         return response;
     }
@@ -540,7 +560,7 @@ public class GoogleDriveEndpoint extends PerUserEndpoint {
 
         final GoogleDriveService service = getService(data, userId, request.getUserEmail(), functionId);
 
-        final Json response = service.putRequest(data.string("path"), content, functionId);
+        final Json response = service.putRequest(buildUrl(data.string("path")), content, functionId);
         logger.info(String.format("Function PUT: [%s]", response.toString()));
         return response;
     }
@@ -556,7 +576,7 @@ public class GoogleDriveEndpoint extends PerUserEndpoint {
 
         final GoogleDriveService service = getService(data, userId, request.getUserEmail(), functionId);
 
-        final Json response = service.patchRequest(data.string("path"), content, functionId);
+        final Json response = service.patchRequest(buildUrl(data.string("path")), content, functionId);
         logger.info(String.format("Function PATCH: [%s]", response.toString()));
         return response;
     }
@@ -570,7 +590,7 @@ public class GoogleDriveEndpoint extends PerUserEndpoint {
 
         final GoogleDriveService service = getService(data, userId, request.getUserEmail(), functionId);
 
-        final Json response = service.deleteRequest(data.string("path"), functionId);
+        final Json response = service.deleteRequest(buildUrl(data.string("path")), functionId);
         logger.info(String.format("Function DELETE: [%s]", response.toString()));
         return response;
     }
@@ -584,5 +604,19 @@ public class GoogleDriveEndpoint extends PerUserEndpoint {
             content = Json.map();
         }
         return content;
+    }
+
+    private String buildUrl(String path) {
+        if (path != null) {
+            if (path.startsWith("https://")) {
+                return path;
+            } else if (path.startsWith("/")) {
+                return API_URL+path;
+            } else {
+                return API_URL+"/"+path;
+            }
+        } else {
+            return API_URL;
+        }
     }
 }
