@@ -15,8 +15,10 @@ import io.slingr.endpoints.utils.Json;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -73,6 +75,14 @@ public class GoogleDriveService {
                 .setSupportsTeamDrives(true)
                 .execute();
         return file.getId();
+    }
+
+    public File fileMetadata(String fileId) throws IOException {
+        return service.files().get(fileId).execute();
+    }
+
+    public void downloadFile(String fileId, OutputStream out) throws IOException {
+        service.files().get(fileId).executeMediaAndDownloadTo(out);
     }
 
     public Json getRequest(String url, String functionId) {

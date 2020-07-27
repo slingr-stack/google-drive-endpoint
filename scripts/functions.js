@@ -88,6 +88,67 @@ endpoint.files.copy = function(fileId, params, body) {
     });
 };
 
+endpoint.files.create = function(params, body) {
+    return endpoint.post({
+        path: '/files/'+fileId,
+        params: params,
+        body: body
+    });
+};
+
+endpoint.files.delete = function(fileId, params) {
+    return endpoint.delete({
+        path: '/files/'+fileId,
+        params: params
+    });
+};
+
+endpoint.files.downloadFile = function(fileId) {
+    return endpoint._downloadFile({
+        fileId: fileId
+    });
+};
+
+endpoint.files.emptyTrash = function() {
+    return endpoint.delete('/files/trash');
+};
+
+endpoint.files.export = function(fileId, params) {
+    return endpoint.get({
+        path: '/files/'+fileId+'/export',
+        params: params
+    });
+};
+
+endpoint.files.generateIds = function(params) {
+    return endpoint.get({
+        path: '/files/generateIds',
+        params: params
+    });
+};
+
+endpoint.files.get = function(fileId, params) {
+    return endpoint.get({
+        path: '/files/'+fileId,
+        params: params
+    });
+};
+
+endpoint.files.list = function(params) {
+    return endpoint.get({
+        path: '/files',
+        params: params
+    });
+};
+
+endpoint.files.update = function(fileId, params, body) {
+    return endpoint.patch({
+        path: '/files/'+fileId,
+        params: params,
+        body: body
+    });
+};
+
 endpoint.files.uploadFile = function(slingrFileId, name, mimeType, folderId) {
     return endpoint._uploadFile({
         fileId: slingrFileId,
@@ -97,9 +158,129 @@ endpoint.files.uploadFile = function(slingrFileId, name, mimeType, folderId) {
     });
 };
 
-endpoint.files.downloadFile = function(fileId) {
-    // TODO
+endpoint.files.watch = function(fileId, params, body) {
+    return endpoint.patch({
+        path: '/files/'+fileId+'/watch',
+        params: params,
+        body: body
+    });
 };
+
+// Permissions
+
+endpoint.permissions = {};
+
+endpoint.permissions.create = function(fileId, params, body) {
+    return endpoint.post({
+        path: '/files/'+fileId+'/permissions',
+        params: params,
+        body: body
+    });
+};
+
+endpoint.permissions.delete = function(fileId, permissionId, params) {
+    return endpoint.delete({
+        path: '/files/'+fileId+'/permissions/'+permissionId,
+        params: params
+    });
+};
+
+endpoint.permissions.get = function(fileId, permissionId, params) {
+    return endpoint.get({
+        path: '/files/'+fileId+'/permissions/'+permissionId,
+        params: params
+    });
+};
+
+endpoint.permissions.list = function(fileId, params) {
+    return endpoint.get({
+        path: '/files/'+fileId+'/permissions',
+        params: params
+    });
+};
+
+endpoint.permissions.update = function(fileId, permissionId, params, body) {
+    return endpoint.patch({
+        path: '/files/'+fileId+'/permissions/'+permissionId,
+        params: params,
+        body: body
+    });
+};
+
+// Replies
+
+endpoint.replies = {};
+
+endpoint.replies.create = function(fileId, commentId, params, body) {
+    return endpoint.post({
+        path: '/files/'+fileId+'/comments/'+commentId+'/replies',
+        params: params,
+        body: body
+    });
+};
+
+endpoint.replies.delete = function(fileId, commentId, replyId, params) {
+    return endpoint.delete({
+        path: '/files/'+fileId+'/comments/'+commentId+'/replies/'+replyId,
+        params: params
+    });
+};
+
+endpoint.replies.get = function(fileId, commentId, replyId, params) {
+    return endpoint.get({
+        path: '/files/'+fileId+'/comments/'+commentId+'/replies/'+replyId,
+        params: params
+    });
+};
+
+endpoint.replies.list = function(fileId, commentId, params) {
+    return endpoint.get({
+        path: '/files/'+fileId+'/comments/'+commentId+'/replies',
+        params: params
+    });
+};
+
+endpoint.replies.update = function(fileId, commentId, replyId, params, body) {
+    return endpoint.patch({
+        path: '/files/'+fileId+'/comments/'+commentId+'/replies/'+replyId,
+        params: params,
+        body: body
+    });
+};
+
+// Revisions
+
+endpoint.revisions = {};
+
+endpoint.revisions.delete = function(fileId, revisionId, params) {
+    return endpoint.delete({
+        path: '/files/'+fileId+'/revisions/'+revisionId,
+        params: params
+    });
+};
+
+endpoint.revisions.get = function(fileId, revisionId, params) {
+    return endpoint.get({
+        path: '/files/'+fileId+'/revisions/'+revisionId,
+        params: params
+    });
+};
+
+endpoint.revisions.list = function(fileId, params) {
+    return endpoint.get({
+        path: '/files/'+fileId+'/revisions',
+        params: params
+    });
+};
+
+endpoint.revisions.update = function(fileId, revisionId, params, body) {
+    return endpoint.patch({
+        path: '/files/'+fileId+'/revisions/'+revisionId,
+        params: params,
+        body: body
+    });
+};
+
 
 // Drives
 

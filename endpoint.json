@@ -65,8 +65,13 @@
             "description": "Gets the user information from Google service."
         },
         {
-            "label": "Uploads file",
+            "label": "Upload file",
             "name": "_uploadFile",
+            "functionType": "PER_USER"
+        },
+        {
+            "label": "Download file",
+            "name": "_downloadFile",
             "functionType": "PER_USER"
         },
         {

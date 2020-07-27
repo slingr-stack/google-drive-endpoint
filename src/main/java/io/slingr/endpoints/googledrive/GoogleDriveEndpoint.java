@@ -1,6 +1,7 @@
 package io.slingr.endpoints.googledrive;
 
 import com.google.api.client.http.HttpResponseException;
+import com.google.api.services.drive.model.File;
 import io.slingr.endpoints.PerUserEndpoint;
 import io.slingr.endpoints.exceptions.EndpointException;
 import io.slingr.endpoints.exceptions.ErrorCode;
@@ -20,7 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -516,6 +517,29 @@ public class GoogleDriveEndpoint extends PerUserEndpoint {
         final String fileId = service.uploadFile(file.getFile(), data.string("name"), data.string("mimeType"), data.string("folderId"));
         Json response = Json.map().set("fileId", fileId);
         logger.info(String.format("Function upload file: [%s]", response.toString()));
+        return response;
+    }
+
+    @EndpointFunction(name = "_downloadFile")
+    public Json downloadFile(FunctionRequest request) throws IOException {
+        final Json data = request.getJsonParams();
+        final String userId = request.getUserId();
+        final String functionId = request.getFunctionId();
+        appLogs.info("Upload file request received", data);
+
+        final GoogleDriveService service = getService(data, userId, request.getUserEmail(), functionId);
+
+        // TODO we should download to a temp file and then upload to slingr, it is the safest way of doing it
+        java.io.File tempFile = java.io.File.createTempFile("googlefile-", "");
+        FileOutputStream out = new FileOutputStream(tempFile);
+        File file = service.fileMetadata(data.string("fileId"));
+        service.downloadFile(data.string("fileId"), out);
+        out.close();
+        FileInputStream in = new FileInputStream(tempFile);
+        Json response = files().upload(file.getName(), in, file.getMimeType());
+        in.close();
+        tempFile.delete();
+        logger.info(String.format("Function download file: [%s]", response.toString()));
         return response;
     }
 
