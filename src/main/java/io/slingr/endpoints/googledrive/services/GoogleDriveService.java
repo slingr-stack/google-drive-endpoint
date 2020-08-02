@@ -6,6 +6,7 @@ import com.google.api.client.http.InputStreamContent;
 import com.google.api.client.json.GenericJson;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.DriveRequest;
 import com.google.api.services.drive.GenericGoogleDriveService;
 import com.google.api.services.drive.model.File;
 import io.slingr.endpoints.exceptions.EndpointException;
@@ -85,9 +86,11 @@ public class GoogleDriveService {
         service.files().get(fileId).executeMediaAndDownloadTo(out);
     }
 
-    public Json getRequest(String url, String functionId) {
+    public Json getRequest(String url, Json params, String functionId) {
         try {
-            final GenericJson json = service.generic().get(url).execute();
+            GenericGoogleDriveService.GenericRequests.GetRequest request = service.generic().get(url);
+            applyParams(request, params);
+            final GenericJson json = request.execute();
             final Json response = getJson(json);
 
             logger.info(String.format("Google response [%s]", response));
@@ -101,9 +104,11 @@ public class GoogleDriveService {
         }
     }
 
-    public Json postRequest(String url, Json content, String functionId) {
+    public Json postRequest(String url, Json params, Json content, String functionId) {
         try {
-            final GenericJson json = service.generic().post(url, content).execute();
+            GenericGoogleDriveService.GenericRequests.PostRequest request = service.generic().post(url, content);
+            applyParams(request, params);
+            final GenericJson json = request.execute();
             final Json response = getJson(json);
 
             logger.info(String.format("Google response [%s]", response));
@@ -117,9 +122,11 @@ public class GoogleDriveService {
         }
     }
 
-    public Json putRequest(String url, Json content, String functionId) {
+    public Json putRequest(String url, Json params, Json content, String functionId) {
         try {
-            final GenericJson json = service.generic().put(url, content).execute();
+            GenericGoogleDriveService.GenericRequests.PutRequest request = service.generic().put(url, content);
+            applyParams(request, params);
+            final GenericJson json = request.execute();
             final Json response = getJson(json);
 
             logger.info(String.format("Google response [%s]", response));
@@ -133,9 +140,11 @@ public class GoogleDriveService {
         }
     }
 
-    public Json patchRequest(String url, Json content, String functionId) {
+    public Json patchRequest(String url, Json params, Json content, String functionId) {
         try {
-            final GenericJson json = service.generic().patch(url, content).execute();
+            GenericGoogleDriveService.GenericRequests.PatchRequest request = service.generic().patch(url, content);
+            applyParams(request, params);
+            final GenericJson json = request.execute();
             final Json response = getJson(json);
 
             logger.info(String.format("Google response [%s]", response));
@@ -149,9 +158,11 @@ public class GoogleDriveService {
         }
     }
 
-    public Json deleteRequest(String url, String functionId) {
+    public Json deleteRequest(String url, Json params, String functionId) {
         try {
-            final GenericJson json = service.generic().delete(url).execute();
+            GenericGoogleDriveService.GenericRequests.DeleteRequest request = service.generic().delete(url);
+            applyParams(request, params);
+            final GenericJson json = request.execute();
             final Json response = getJson(json);
 
             logger.info(String.format("Google response [%s]", response));
@@ -162,6 +173,14 @@ public class GoogleDriveService {
             return processHttpResponseException(functionId, e);
         } catch (Exception e) {
             return processException(e);
+        }
+    }
+
+    private void applyParams(DriveRequest request, Json params) {
+        if (params != null) {
+            for (String key : params.keys()) {
+                request.set(key, params.object(key));
+            }
         }
     }
 
