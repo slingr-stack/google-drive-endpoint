@@ -81,7 +81,7 @@ endpoint.comments.update = function(fileId, commentId, params, body) {
 endpoint.files = {};
 
 endpoint.files.copy = function(fileId, params, body) {
-    return endpoint.patch({
+    return endpoint.post({
         path: '/files/'+fileId+'/copy',
         params: params,
         body: body
