@@ -87,7 +87,7 @@ public class GoogleDriveService {
     }
 
     public void exportFile(String fileId, String mimeType, OutputStream out) throws IOException {
-        service.files().export(fileId, mimeType).executeMediaAndDownloadTo(out);
+        service.files().export(fileId, mimeType).executeAndDownloadTo(out);
     }
 
     public Json getRequest(String url, Json params, String functionId) {
