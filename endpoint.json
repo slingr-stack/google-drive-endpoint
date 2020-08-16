@@ -75,6 +75,11 @@
             "functionType": "PER_USER"
         },
         {
+            "label": "Export file",
+            "name": "_exportFile",
+            "functionType": "PER_USER"
+        },
+        {
             "label": "GET request",
             "name": "_getRequest",
             "functionType": "PER_USER"

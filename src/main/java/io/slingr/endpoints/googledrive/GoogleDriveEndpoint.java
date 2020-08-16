@@ -525,11 +525,10 @@ public class GoogleDriveEndpoint extends PerUserEndpoint {
         final Json data = request.getJsonParams();
         final String userId = request.getUserId();
         final String functionId = request.getFunctionId();
-        appLogs.info("Upload file request received", data);
+        appLogs.info("Download file request received", data);
 
         final GoogleDriveService service = getService(data, userId, request.getUserEmail(), functionId);
 
-        // TODO we should download to a temp file and then upload to slingr, it is the safest way of doing it
         java.io.File tempFile = java.io.File.createTempFile("googlefile-", "");
         FileOutputStream out = new FileOutputStream(tempFile);
         File file = service.fileMetadata(data.string("fileId"));
@@ -537,6 +536,29 @@ public class GoogleDriveEndpoint extends PerUserEndpoint {
         out.close();
         FileInputStream in = new FileInputStream(tempFile);
         Json response = files().upload(file.getName(), in, file.getMimeType());
+        in.close();
+        tempFile.delete();
+        logger.info(String.format("Function download file: [%s]", response.toString()));
+        return response;
+    }
+
+
+    @EndpointFunction(name = "_exportFile")
+    public Json exportFile(FunctionRequest request) throws IOException {
+        final Json data = request.getJsonParams();
+        final String userId = request.getUserId();
+        final String functionId = request.getFunctionId();
+        appLogs.info("Export file request received", data);
+
+        final GoogleDriveService service = getService(data, userId, request.getUserEmail(), functionId);
+
+        java.io.File tempFile = java.io.File.createTempFile("googlefile-", "");
+        FileOutputStream out = new FileOutputStream(tempFile);
+        File file = service.fileMetadata(data.string("fileId"));
+        service.exportFile(data.string("fileId"), data.string("mimeType"), out);
+        out.close();
+        FileInputStream in = new FileInputStream(tempFile);
+        Json response = files().upload(file.getName(), in, data.string("mimeType"));
         in.close();
         tempFile.delete();
         logger.info(String.format("Function download file: [%s]", response.toString()));
