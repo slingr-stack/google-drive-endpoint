@@ -113,10 +113,11 @@ endpoint.files.emptyTrash = function() {
     return endpoint.delete('/files/trash');
 };
 
-endpoint.files.export = function(fileId, mimeType) {
+endpoint.files.export = function(fileId, params) {
     return endpoint._exportFile({
         fileId: fileId,
-        mimeType: mimeType
+        path: '/files/'+fileId+'/export',
+        params: params
     });
 };
 

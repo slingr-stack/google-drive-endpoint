@@ -555,7 +555,7 @@ public class GoogleDriveEndpoint extends PerUserEndpoint {
         java.io.File tempFile = java.io.File.createTempFile("googlefile-", "");
         FileOutputStream out = new FileOutputStream(tempFile);
         File file = service.fileMetadata(data.string("fileId"));
-        service.exportFile(data.string("fileId"), data.string("mimeType"), out);
+        service.getRequestAndDownload(buildUrl(data.string("path")), data.json("params"), out, functionId);
         out.close();
         FileInputStream in = new FileInputStream(tempFile);
         Json response = files().upload(file.getName(), in, data.string("mimeType"));

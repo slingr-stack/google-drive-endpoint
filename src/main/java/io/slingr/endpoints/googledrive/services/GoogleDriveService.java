@@ -108,6 +108,12 @@ public class GoogleDriveService {
         }
     }
 
+    public void getRequestAndDownload(String url, Json params, OutputStream out, String functionId) throws IOException {
+        GenericGoogleDriveService.GenericRequests.GetRequest request = service.generic().get(url);
+        applyParams(request, params);
+        request.executeAndDownloadTo(out);
+    }
+
     public Json postRequest(String url, Json params, Json content, String functionId) {
         try {
             GenericGoogleDriveService.GenericRequests.PostRequest request = service.generic().post(url, content);
