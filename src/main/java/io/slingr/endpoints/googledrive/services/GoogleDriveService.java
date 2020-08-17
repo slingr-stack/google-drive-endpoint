@@ -79,7 +79,10 @@ public class GoogleDriveService {
     }
 
     public File fileMetadata(String fileId) throws IOException {
-        return service.files().get(fileId).execute();
+        return service.files()
+                .get(fileId)
+                .setSupportsTeamDrives(true)
+                .execute();
     }
 
     public void downloadFile(String fileId, OutputStream out) throws IOException {
