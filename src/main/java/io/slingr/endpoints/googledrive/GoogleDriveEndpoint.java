@@ -18,9 +18,13 @@ import io.slingr.endpoints.utils.Json;
 import io.slingr.endpoints.utils.MapsUtils;
 import io.slingr.endpoints.ws.exchange.FunctionRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tika.mime.MimeType;
+import org.apache.tika.mime.MimeTypeException;
+import org.apache.tika.mime.MimeTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -560,6 +564,14 @@ public class GoogleDriveEndpoint extends PerUserEndpoint {
         out.close();
         FileInputStream in = new FileInputStream(tempFile);
         String fileName = file.getName().replaceAll("/", "-");
+        try {
+            MimeType mimeType = MimeTypes.getDefaultMimeTypes().forName(data.json("params").string("mimeType"));
+            if (!fileName.toLowerCase().endsWith(mimeType.getExtension())) {
+                fileName = fileName+mimeType.getExtension();
+            }
+        } catch (Exception e) {
+            logger.info("It was not possible to determine extension for mime type");
+        }
         Json response = files().upload(fileName, in, data.string("mimeType"));
         in.close();
         tempFile.delete();
