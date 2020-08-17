@@ -535,7 +535,8 @@ public class GoogleDriveEndpoint extends PerUserEndpoint {
         service.downloadFile(data.string("fileId"), out);
         out.close();
         FileInputStream in = new FileInputStream(tempFile);
-        Json response = files().upload(file.getName(), in, file.getMimeType());
+        String fileName = file.getName().replaceAll("/", "-");
+        Json response = files().upload(fileName, in, file.getMimeType());
         in.close();
         tempFile.delete();
         logger.info(String.format("Function download file: [%s]", response.toString()));
@@ -558,7 +559,8 @@ public class GoogleDriveEndpoint extends PerUserEndpoint {
         service.getRequestAndDownload(buildUrl(data.string("path")), data.json("params"), out, functionId);
         out.close();
         FileInputStream in = new FileInputStream(tempFile);
-        Json response = files().upload(file.getName(), in, data.string("mimeType"));
+        String fileName = file.getName().replaceAll("/", "-");
+        Json response = files().upload(fileName, in, data.string("mimeType"));
         in.close();
         tempFile.delete();
         logger.info(String.format("Function download file: [%s]", response.toString()));
