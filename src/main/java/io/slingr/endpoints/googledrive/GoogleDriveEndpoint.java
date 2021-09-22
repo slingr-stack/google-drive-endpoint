@@ -518,7 +518,7 @@ public class GoogleDriveEndpoint extends PerUserEndpoint {
         final GoogleDriveService service = getService(data, userId, request.getUserEmail(), functionId);
 
         DownloadedFile file = files().download(data.string("fileId"));
-        final String fileId = service.uploadFile(file.getFile(), data.string("name"), data.string("mimeType"), data.string("folderId"));
+        final String fileId = service.uploadFile(file.getFile(), data.string("name"), data.string("mimeType"), data.string("folderId"), data.string("originalMimeType"));
         Json response = Json.map().set("fileId", fileId);
         logger.info(String.format("Function upload file: [%s]", response.toString()));
         return response;

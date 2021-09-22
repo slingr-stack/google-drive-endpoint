@@ -90,7 +90,7 @@ endpoint.files.copy = function(fileId, params, body) {
 
 endpoint.files.create = function(params, body) {
     return endpoint.post({
-        path: '/files/'+fileId,
+        path: '/files',
         params: params,
         body: body
     });
@@ -150,12 +150,13 @@ endpoint.files.update = function(fileId, params, body) {
     });
 };
 
-endpoint.files.uploadFile = function(slingrFileId, name, mimeType, folderId) {
+endpoint.files.uploadFile = function(slingrFileId, name, mimeType, folderId, originalMimeType) {
     return endpoint._uploadFile({
         fileId: slingrFileId,
         name: name,
         mimeType: mimeType,
-        folderId: folderId
+        folderId: folderId,
+        originalMimeType: originalMimeType
     });
 };
 
