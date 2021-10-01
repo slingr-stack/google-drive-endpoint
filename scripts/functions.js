@@ -151,6 +151,9 @@ endpoint.files.update = function(fileId, params, body) {
 };
 
 endpoint.files.uploadFile = function(slingrFileId, name, mimeType, folderId, originalMimeType) {
+    if (!originalMimeType) {
+        originalMimeType = mimeType;
+    }
     return endpoint._uploadFile({
         fileId: slingrFileId,
         name: name,
