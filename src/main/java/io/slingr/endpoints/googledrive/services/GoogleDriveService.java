@@ -64,13 +64,14 @@ public class GoogleDriveService {
         this.endpoint = endpoint;
     }
 
-    public String uploadFile(InputStream is, String name, String mimeType, String folderId) throws IOException {
+    public String uploadFile(InputStream is, String name, String mimeType, String folderId, String originalMimeType) throws IOException {
         File fileMetadata = new File();
         fileMetadata.setName(name);
+        fileMetadata.setMimeType(mimeType);
         if (folderId != null) {
             fileMetadata.setParents(Collections.singletonList(folderId));
         }
-        InputStreamContent mediaContent = new InputStreamContent(mimeType, is);
+        InputStreamContent mediaContent = new InputStreamContent(originalMimeType, is);
         File file = service.files().create(fileMetadata, mediaContent)
                 .setFields("id, parents")
                 .setSupportsTeamDrives(true)
