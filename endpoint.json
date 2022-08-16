@@ -12,6 +12,13 @@
                 "memory": 256,
                 "offHeapMinFactor": 1.5,
                 "description": "Default configuration"
+            },
+            {
+                "name": "bigFiles",
+                "label": "Big Files",
+                "memory": 348,
+                "offHeapMinFactor": 1.5,
+                "description": "Big Files"
             }
         ],
         "allowMultipleInstances": false
