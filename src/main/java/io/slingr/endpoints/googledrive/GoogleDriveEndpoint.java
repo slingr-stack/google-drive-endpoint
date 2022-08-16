@@ -1,6 +1,7 @@
 package io.slingr.endpoints.googledrive;
 
 import com.google.api.client.http.HttpResponseException;
+import com.google.api.client.json.JsonParser;
 import com.google.api.services.drive.model.File;
 import io.slingr.endpoints.PerUserEndpoint;
 import io.slingr.endpoints.exceptions.EndpointException;
@@ -25,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.activation.MimetypesFileTypeMap;
+import javax.json.JsonObject;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -547,6 +549,36 @@ public class GoogleDriveEndpoint extends PerUserEndpoint {
         return response;
     }
 
+    @EndpointFunction(name = "_downloadExportLink")
+    public Json downloadExportLink(FunctionRequest request) throws IOException {
+        final Json data = request.getJsonParams();
+        final String userId = request.getUserId();
+        final String functionId = request.getFunctionId();
+        appLogs.info("Download export link request received", data);
+
+        final GoogleDriveService service = getService(data, userId, request.getUserEmail(), functionId);
+
+        java.io.File tempFile = java.io.File.createTempFile("googlefile-", "");
+        FileOutputStream out = new FileOutputStream(tempFile);
+        File file = service.fileMetadata(data.string("fileId"));
+
+        Json params = Json.map();
+        params.set("supportsAllDrives", true);
+        params.set("fields", "*");
+        Json fileData = service.getRequest(API_URL + "/files/"+ data.string("fileId"), params, functionId);
+        List<String> resLinks = Arrays.asList(fileData.toMap().get("exportLinks").toString().split(","));
+        String pdfDownloadUrl = resLinks.get(1).replace("application/pdf=", "");
+
+        service.downloadExportLink(pdfDownloadUrl, out);
+        out.close();
+        FileInputStream in = new FileInputStream(tempFile);
+        String fileName = file.getName().replaceAll("/", "-");
+        Json response = files().upload(fileName+".pdf", in, data.string("mimeType"));
+        in.close();
+        tempFile.delete();
+        logger.info(String.format("Function download file: [%s]", response.toString()));
+        return response;
+    }
 
     @EndpointFunction(name = "_exportFile")
     public Json exportFile(FunctionRequest request) throws IOException {

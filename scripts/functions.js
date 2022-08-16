@@ -109,14 +109,21 @@ endpoint.files.downloadFile = function(fileId) {
     });
 };
 
+endpoint.files.downloadExportLink = function(fileId, mimeType) {
+    return endpoint._downloadExportLink({
+        fileId: fileId,
+        mimeType: mimeType
+    });
+};
+
 endpoint.files.emptyTrash = function() {
     return endpoint.delete('/files/trash');
 };
 
-endpoint.files.export = function(fileId, params) {
+endpoint.files.export = function(fileId, path, params) {
     return endpoint._exportFile({
         fileId: fileId,
-        path: '/files/'+fileId+'/export',
+        path:  path ? path : '/files/'+fileId+'/export',
         params: params
     });
 };

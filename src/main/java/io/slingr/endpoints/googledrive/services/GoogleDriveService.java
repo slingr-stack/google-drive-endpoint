@@ -1,6 +1,7 @@
 package io.slingr.endpoints.googledrive.services;
 
 import com.google.api.client.http.FileContent;
+import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.InputStreamContent;
 import com.google.api.client.json.GenericJson;
@@ -88,6 +89,10 @@ public class GoogleDriveService {
 
     public void downloadFile(String fileId, OutputStream out) throws IOException {
         service.files().get(fileId).executeMediaAndDownloadTo(out);
+    }
+
+    public void downloadExportLink(String url, OutputStream out) throws IOException {
+        service.getRequestFactory().buildGetRequest(new GenericUrl(url)).execute().download(out);
     }
 
     public void exportFile(String fileId, String mimeType, OutputStream out) throws IOException {
