@@ -1,7 +1,6 @@
 package io.slingr.endpoints.googledrive;
 
 import com.google.api.client.http.HttpResponseException;
-import com.google.api.client.json.JsonParser;
 import com.google.api.services.drive.model.File;
 import io.slingr.endpoints.PerUserEndpoint;
 import io.slingr.endpoints.exceptions.EndpointException;
@@ -11,30 +10,19 @@ import io.slingr.endpoints.googledrive.services.*;
 import io.slingr.endpoints.googledrive.services.entities.ValidToken;
 import io.slingr.endpoints.services.AppLogs;
 import io.slingr.endpoints.services.datastores.DataStore;
-import io.slingr.endpoints.services.datastores.DataStoreResponse;
-import io.slingr.endpoints.services.exchange.Parameter;
 import io.slingr.endpoints.services.exchange.ReservedName;
 import io.slingr.endpoints.services.rest.DownloadedFile;
 import io.slingr.endpoints.utils.Json;
-import io.slingr.endpoints.utils.MapsUtils;
 import io.slingr.endpoints.ws.exchange.FunctionRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.mime.MimeType;
-import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.activation.MimetypesFileTypeMap;
-import javax.json.JsonObject;
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * <p>Google Drive endpoint
@@ -66,7 +54,7 @@ public class GoogleDriveEndpoint extends PerUserEndpoint {
     private AppLogs appLogs;
 
     @EndpointUserDataStore
-    private DataStore usersDataStore;
+    private DataStore googleDriveStore;
 
     @EndpointProperty
     private String clientId;
@@ -129,7 +117,7 @@ public class GoogleDriveEndpoint extends PerUserEndpoint {
         try {
             // check stored configuration
             try {
-                final Json storedConfiguration = usersDataStore.findById(userId);
+                final Json storedConfiguration = googleDriveStore.findById(userId);
                 if (storedConfiguration != null) {
                     configuration.setIfNotNull(PROPERTY_RESULT, storedConfiguration.string(PROPERTY_RESULT));
                     configuration.setIfNotNull(PROPERTY_NAME, storedConfiguration.string(PROPERTY_NAME));
@@ -207,7 +195,7 @@ public class GoogleDriveEndpoint extends PerUserEndpoint {
         }
 
         configuration.set("_id", userId);
-        final Json conf = usersDataStore.save(configuration);
+        final Json conf = googleDriveStore.save(configuration);
         if(connected) {
             final Json event = Json.map()
                     .setIfNotNull("userId", userId)
@@ -318,7 +306,7 @@ public class GoogleDriveEndpoint extends PerUserEndpoint {
 
                 // save configuration
                 user.set("_id", userId);
-                usersDataStore.save(user);
+                googleDriveStore.save(user);
 
                 logger.debug(String.format("User configuration [%s] was saved [%s]", userId, user.toString()));
 
@@ -337,7 +325,7 @@ public class GoogleDriveEndpoint extends PerUserEndpoint {
             logger.debug(String.format("Remove user configuration [%s]", userId));
             try {
                 // remove last user configuration
-                usersDataStore.removeById(userId);
+                googleDriveStore.removeById(userId);
 
                 logger.debug(String.format("User configuration [%s] was deleted", userId));
             } catch (Exception ex){
@@ -352,7 +340,7 @@ public class GoogleDriveEndpoint extends PerUserEndpoint {
             logger.debug(String.format("Checking user configuration [%s]", userId));
             try {
                 // check last user configuration
-                response = usersDataStore.findById(userId);
+                response = googleDriveStore.findById(userId);
 
                 if(response != null && !response.isEmpty()) {
                     logger.info(String.format("User configuration [%s] was found", userId));

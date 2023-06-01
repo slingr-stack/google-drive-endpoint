@@ -26,6 +26,7 @@
     "configurationHelpUrl": "/endpoints_google_drive.html",
     "status": "ACTIVE",
     "stores": [
+        { "name": "googleDriveStore" }
     ],
     "events": [
         {
