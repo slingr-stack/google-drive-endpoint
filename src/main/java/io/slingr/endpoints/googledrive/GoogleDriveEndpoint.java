@@ -65,7 +65,7 @@ public class GoogleDriveEndpoint extends PerUserEndpoint {
     @EndpointProperty
     private String redirectUri;
 
-    @EndpointProperty(name = "single")
+    @EndpointProperty
     private String clientType;
 
     @EndpointProperty
